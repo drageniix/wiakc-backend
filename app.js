@@ -1,5 +1,4 @@
 require("dotenv").config();
-require("dotenv").config();
 
 const path = require("path");
 const authRoutes = require("./routes/auth");
@@ -42,7 +41,7 @@ mongoose
     { useNewUrlParser: true }
   )
   .then(() => {
-    const server = app.listen(process.env.PORT || 3000);
+    const server = app.listen(process.env.PORT || 5000);
     socket.init(server);
   })
   .catch(err => console.log(err));
