@@ -41,7 +41,7 @@ mongoose
     { useNewUrlParser: true }
   )
   .then(() => {
-    const server = app.listen(process.env.PORT || 5000);
+    const server = app.listen(process.env.PORT || 8080);
     socket.init(server);
   })
   .catch(err => console.log(err));
