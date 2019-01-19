@@ -6,7 +6,7 @@ exports.alterPost = (req, res, next) =>
       if (!post) {
         const error = new Error("Could not find post.");
         error.statusCode = 404;
-        throw error;
+        next(error);
       }
       if (
         post.creator._id.toString() !== req.userId &&
@@ -14,7 +14,7 @@ exports.alterPost = (req, res, next) =>
       ) {
         const error = new Error("Not authorized!");
         error.statusCode = 403;
-        throw error;
+        next(error);
       }
       next();
     })

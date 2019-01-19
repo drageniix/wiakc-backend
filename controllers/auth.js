@@ -16,7 +16,8 @@ exports.signup = async (req, res, next) => {
     .then(user => {
       const response = login(user);
       return res.status(201).json(response);
-    });
+    })
+    .catch(err => next(err));
 };
 
 exports.login = async (req, res, next) =>

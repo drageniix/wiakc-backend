@@ -6,7 +6,7 @@ exports.alterComment = (req, res, next) =>
       if (!comment) {
         const error = new Error("Could not find comment.");
         error.statusCode = 404;
-        throw error;
+        next(error);
       }
       if (
         comment.creator._id.toString() !== req.userId &&
@@ -14,7 +14,7 @@ exports.alterComment = (req, res, next) =>
       ) {
         const error = new Error("Not authorized!");
         error.statusCode = 403;
-        throw error;
+        next(error);
       }
       next();
     })

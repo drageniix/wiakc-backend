@@ -13,9 +13,9 @@ exports.isAuth = (req, res, next) => {
   ) {
     req.userId = decodedToken.userId;
   } else {
-    const authError = new Error("Not authenticated.");
-    authError.statusCode = 401;
-    throw authError;
+    const error = new Error("Not authenticated.");
+    error.statusCode = 401;
+    next(error);
   }
   next();
 };
@@ -26,7 +26,7 @@ exports.inputValidation = (req, res, next) => {
     const error = new Error("Validation failed.");
     error.statusCode = 422;
     error.data = errors.array();
-    throw error;
+    next(error);
   }
   next();
 };

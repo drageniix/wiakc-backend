@@ -6,7 +6,7 @@ exports.alterEvent = (req, res, next) =>
       if (!event) {
         const error = new Error("Could not find event.");
         error.statusCode = 404;
-        throw error;
+        next(error);
       }
       if (
         event.creator._id.toString() !== req.userId &&
@@ -14,7 +14,7 @@ exports.alterEvent = (req, res, next) =>
       ) {
         const error = new Error("Not authorized!");
         error.statusCode = 403;
-        throw error;
+        next(error);
       }
       next();
     })
