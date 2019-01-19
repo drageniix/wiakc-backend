@@ -38,7 +38,7 @@ exports.createPost = async (req, res, next) => {
   }).save();
 
   const user = await User.findById(req.userId);
-  user.posts.push(post);
+  user.posts.push(post._id);
   await user.save();
 
   const response = {
@@ -83,8 +83,8 @@ exports.updatePost = (req, res, next) => {
     { $set: { title, content } },
     { new: true }
   )
-    .then(post => {
-      const response = { message: "Updated post.", post };
+    .then(() => {
+      const response = { message: "Updated post.", post: req.params.postId };
       io.getIO().emit("posts", { action: "update", ...response });
       return res.status(200).json(response);
     })
@@ -96,9 +96,9 @@ exports.deletePost = async (req, res, next) => {
   user.posts.pull(req.params.postId);
 
   Post.findOneAndRemove({ id_: req.params.postId })
-    .then(async post => {
+    .then(async () => {
       await user.save();
-      const response = { message: "Deleted post.", post };
+      const response = { message: "Deleted post.", post: req.params.postId };
       io.getIO().emit("posts", { action: "delete", ...response });
       res.status(200).json(response);
     })

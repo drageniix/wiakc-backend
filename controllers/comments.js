@@ -39,8 +39,11 @@ exports.updateComment = (req, res, next) => {
   const { content } = req.body;
 
   Comment.findOneAndUpdate({ _id: req.params.commentId }, { $set: { content } })
-    .then(comment => {
-      const response = { message: "Updated comment.", comment };
+    .then(() => {
+      const response = {
+        message: "Updated comment.",
+        comment: req.params.commentId
+      };
 
       io.getIO().emit("comments", {
         action: "update",
@@ -60,11 +63,14 @@ exports.deleteComment = async (req, res, next) => {
   post.comments.pull(req.params.commentId);
 
   Comment.findOneAndDelete({ _id: req.params.commentId })
-    .then(async comment => {
+    .then(async () => {
       await user.save();
       await post.save();
 
-      const response = { message: "Deleted comment.", comment };
+      const response = {
+        message: "Deleted comment.",
+        comment: req.params.commentId
+      };
 
       io.getIO().emit("comments", {
         action: "delete",

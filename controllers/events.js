@@ -68,10 +68,10 @@ exports.updateEvent = (req, res, next) => {
     },
     { new: true }
   )
-    .then(event => {
+    .then(() => {
       const response = {
         message: "Updated event.",
-        event
+        event: req.params.eventId
       };
 
       io.getIO().emit("events", { action: "update", ...response });
@@ -82,10 +82,10 @@ exports.updateEvent = (req, res, next) => {
 
 exports.deleteEvent = (req, res, next) =>
   Event.findOneAndDelete({ id_: req.params.eventId })
-    .then(event => {
+    .then(() => {
       const response = {
         message: "Deleted event.",
-        event
+        event: req.params.eventId
       };
 
       io.getIO().emit("events", { action: "delete", ...response });
