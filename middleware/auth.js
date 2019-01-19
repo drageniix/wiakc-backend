@@ -15,21 +15,19 @@ exports.validateSignup = [
         }
       })
     ),
-  body("password")
-    .trim()
-    .isLength({ min: 5 })
-    .withMessage("Password must be at least 5 characters."),
-  body("confirm_password")
-    .trim()
-    .custom((confirmedPassword, { req: { body: { password } } }) => {
-      if (confirmedPassword !== password) {
-        throw new Error("Passwords don't match.");
-      }
-    }),
   body("name")
     .trim()
     .not()
-    .isEmpty(),
+    .isEmpty()
+    .withMessage("Please give a name."),
+  body("password")
+    .isLength({ min: 5 })
+    .withMessage("Password must be at least 5 characters."),
+  body("confirm_password").custom((confirmedPassword, { req }) => {
+    if (confirmedPassword !== req.body.password) {
+      throw new Error("Passwords don't match.");
+    } else return true;
+  }),
   commonMiddleware.inputValidation
 ];
 
@@ -48,7 +46,6 @@ exports.validateLogin = [
       })
     ),
   body("password")
-    .trim()
     .isLength({ min: 5 })
     .withMessage("Password must be at least 5 characters")
     .custom(async (password, { req: { loginAttemptPW } }) => {
