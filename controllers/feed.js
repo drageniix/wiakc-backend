@@ -79,8 +79,8 @@ exports.updatePost = (req, res, next) => {
   const { title, content } = req.body;
 
   Post.findOneAndUpdate(
-    { id_: req.params.postId },
-    { title, content },
+    { _id: req.params.postId },
+    { $set: { title, content } },
     { new: true }
   )
     .exec()
@@ -96,7 +96,7 @@ exports.deletePost = async (req, res, next) => {
   const user = await User.findById(req.userId);
   user.posts.pull(req.params.postId);
 
-  Post.findOneAndRemove({ id_: req.params.postId })
+  Post.findOneAndDelete({ _id: req.params.postId })
     .exec()
     .then(async () => {
       await user.save();

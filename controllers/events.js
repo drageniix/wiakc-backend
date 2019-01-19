@@ -57,12 +57,14 @@ exports.updateEvent = (req, res, next) => {
   const { date, title, details, emphasis } = req.body;
 
   Event.findOneAndUpdate(
-    { id_: req.params.eventId },
+    { _id: req.params.eventId },
     {
-      date,
-      emphasis,
-      title,
-      details
+      $set: {
+        date,
+        emphasis,
+        title,
+        details
+      }
     },
     { new: true }
   )
@@ -80,7 +82,7 @@ exports.updateEvent = (req, res, next) => {
 };
 
 exports.deleteEvent = (req, res, next) =>
-  Event.findOneAndDelete({ id_: req.params.eventId })
+  Event.findOneAndDelete({ _id: req.params.eventId })
     .exec()
     .then(() => {
       const response = {

@@ -40,7 +40,7 @@ exports.updateComment = (req, res, next) => {
 
   Comment.findOneAndUpdate(
     { _id: req.params.commentId },
-    { content },
+    { $set: { content } },
     { new: true }
   )
     .exec()
