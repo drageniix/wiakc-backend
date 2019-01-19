@@ -25,7 +25,7 @@ exports.inputValidation = (req, res, next) => {
   if (!errors.isEmpty()) {
     const error = new Error("Validation failed.");
     error.statusCode = 422;
-    error.data = errors.array();
+    error.data = errors.array({ onlyFirstError: true });
     next(error);
   }
   next();
