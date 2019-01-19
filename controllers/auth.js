@@ -40,6 +40,9 @@ function login(user) {
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
       ),
+    name: user.name,
+    country: user.country,
+    email: user.email,
     userId: user._id.toString(),
     privilege: user.privilege
   };
