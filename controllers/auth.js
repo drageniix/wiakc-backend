@@ -43,7 +43,8 @@ function login(user) {
     user: {
       name: user.name,
       country: user.country,
-      email: user.email
+      email: user.email,
+      privilege: user.privilege
     },
     userId: user._id.toString(),
     privilege: user.privilege
