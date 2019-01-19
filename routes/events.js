@@ -7,10 +7,10 @@ const commonMiddleware = require("../middleware/common");
 
 const router = express.Router();
 
-router.get("/events", eventController.getEvents);
+router.get("/", eventController.getEvents);
 
 router.post(
-  "/event",
+  "/",
   commonMiddleware.isAuth,
   [
     body("title")
@@ -22,7 +22,7 @@ router.post(
 );
 
 router.put(
-  "/event/:eventId",
+  "/:eventId",
   commonMiddleware.isAuth,
   [
     body("title")
@@ -35,7 +35,7 @@ router.put(
 );
 
 router.delete(
-  "/event/:eventId",
+  "/:eventId",
   commonMiddleware.isAuth,
   eventMiddleware.alterEvent,
   eventController.deleteEvent
