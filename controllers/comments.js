@@ -39,10 +39,10 @@ exports.updateComment = (req, res, next) => {
   const { content } = req.body;
 
   Comment.findOneAndUpdate({ _id: req.params.commentId }, { $set: { content } })
-    .then(() => {
+    .then(comment => {
       const response = {
         message: "Updated comment.",
-        comment: req.params.commentId
+        comment
       };
 
       io.getIO().emit("comments", {

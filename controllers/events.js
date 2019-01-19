@@ -68,10 +68,10 @@ exports.updateEvent = (req, res, next) => {
     },
     { new: true }
   )
-    .then(() => {
+    .then(event => {
       const response = {
         message: "Updated event.",
-        event: req.params.eventId
+        event
       };
 
       io.getIO().emit("events", { action: "update", ...response });

@@ -83,8 +83,8 @@ exports.updatePost = (req, res, next) => {
     { $set: { title, content } },
     { new: true }
   )
-    .then(() => {
-      const response = { message: "Updated post.", post: req.params.postId };
+    .then(post => {
+      const response = { message: "Updated post.", post };
       io.getIO().emit("posts", { action: "update", ...response });
       return res.status(200).json(response);
     })
