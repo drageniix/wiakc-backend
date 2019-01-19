@@ -8,6 +8,9 @@ exports.validateEvent = [
     .not()
     .isEmpty()
     .withMessage("Event must have a title."),
+  body("date")
+    .isNumeric()
+    .withMessage("Date is not valid."),
   commonMiddleware.inputValidation
 ];
 

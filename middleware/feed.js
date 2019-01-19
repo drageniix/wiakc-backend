@@ -5,10 +5,12 @@ const commonMiddleware = require("./common");
 exports.validatePost = [
   body("title")
     .trim()
-    .isLength({ min: 5 }),
+    .not()
+    .isEmpty(),
   body("content")
     .trim()
-    .isLength({ min: 5 }),
+    .not()
+    .isEmpty(),
   commonMiddleware.inputValidation
 ];
 

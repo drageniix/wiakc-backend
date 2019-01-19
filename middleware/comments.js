@@ -5,7 +5,8 @@ const commonMiddleware = require("./common");
 exports.validateComment = [
   body("content")
     .trim()
-    .isLength({ min: 2 }),
+    .not()
+    .isEmpty(),
   commonMiddleware.inputValidation
 ];
 

@@ -6,15 +6,15 @@ const commonMiddleware = require("./common");
 exports.validateSignup = [
   body("email")
     .isEmail()
+    .normalizeEmail()
     .withMessage("Please enter a valid email.")
     .custom((email, { req }) =>
       User.findOne({ email }).then(user => {
         if (user) {
-          Promise.reject("A user with this email already exists.");
+          throw new Error("A user with this email already exists.");
         }
       })
-    )
-    .normalizeEmail(),
+    ),
   body("password")
     .trim()
     .isLength({ min: 5 })
@@ -36,26 +36,25 @@ exports.validateSignup = [
 exports.validateLogin = [
   body("email")
     .isEmail()
+    .normalizeEmail()
+    .withMessage("Please enter a valid email.")
     .custom((email, { req }) =>
       User.findOne({ email }).then(user => {
         if (!user) {
-          Promise.reject("A user with this email could not be found.");
+          throw new Error("A user with this email could not be found.");
+        } else {
+          req.loginAttemptPW = user.password;
         }
       })
-    )
-    .normalizeEmail(),
+    ),
   body("password")
     .trim()
     .isLength({ min: 5 })
     .withMessage("Password must be at least 5 characters")
-    .custom((password, { req: { body: { email } } }) =>
-      User.findOne({ email })
-        .then(user => bcrypt.compare(password, user.password))
-        .then(match => {
-          if (!match) {
-            Promise.reject("Incorrect email or password.");
-          }
-        })
-    ),
+    .custom(async (password, { req: { loginAttemptPW } }) => {
+      if (loginAttemptPW && !(await bcrypt.compare(password, loginAttemptPW))) {
+        throw new Error("Incorrect email or password.");
+      }
+    }),
   commonMiddleware.inputValidation
 ];
