@@ -1,13 +1,15 @@
 const express = require("express");
 const { body } = require("express-validator/check");
 
+const commentRoutes = require("./comments");
+
 const feedController = require("../controllers/feed");
 const feedMiddleware = require("../middleware/feed");
 const commonMiddleware = require("../middleware/common");
 
 const router = express.Router();
 
-router.get("/posts", commonMiddleware.isAuth, feedController.getPosts);
+router.get("/posts", feedController.getPosts);
 
 router.post(
   "/post",
@@ -24,7 +26,7 @@ router.post(
   feedController.createPost
 );
 
-router.get("/post/:postId", commonMiddleware.isAuth, feedController.getPost);
+router.get("/post/:postId", feedController.getPost);
 
 router.put(
   "/post/:postId",
@@ -48,5 +50,7 @@ router.delete(
   feedMiddleware.alterPost,
   feedController.deletePost
 );
+
+router.use("/post/:postId/comments", commentRoutes);
 
 module.exports = router;

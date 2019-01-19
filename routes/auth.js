@@ -33,6 +33,19 @@ router.post(
   authController.signup
 );
 
-router.post("/login", authMiddleware.login, authController.login);
+router.post(
+  "/login",
+  [
+    body("email")
+      .isEmail()
+      .normalizeEmail(),
+    body("password")
+      .trim()
+      .isLength({ min: 5 })
+  ],
+  commonMiddleware.inputValidation,
+  authMiddleware.login,
+  authController.login
+);
 
 module.exports = router;

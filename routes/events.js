@@ -21,8 +21,6 @@ router.post(
   eventController.createEvent
 );
 
-router.get("/event/:eventId", eventController.getEvent);
-
 router.put(
   "/event/:eventId",
   commonMiddleware.isAuth,

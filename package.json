@@ -4,7 +4,8 @@
   "description": "Server for WIA-KC",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node server.js",
+    "start-dev": "nodemon server.js"
   },
   "engines": {
     "node": "11.x"
@@ -28,5 +29,8 @@
     "kansas city"
   ],
   "author": "Ashley Barrow",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  }
 }

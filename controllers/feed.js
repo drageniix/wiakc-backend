@@ -3,19 +3,27 @@ const io = require("../middleware/socket");
 const Post = require("../models/post");
 const User = require("../models/user");
 
-const PER_PAGE = 2;
+const PER_PAGE = 10;
 
 exports.getPosts = async (req, res, next) => {
   const currentPage = req.query.page || 1;
   const totalItems = await Post.find().countDocuments();
+
   const posts = await Post.find()
-    .populate("creator")
+    .populate([
+      { path: "creator", select: "name country" },
+      {
+        path: "comments",
+        select: "content createdAt",
+        populate: { path: "creator", select: "name country" }
+      }
+    ])
     .sort({ createdAt: -1 })
     .skip((currentPage - 1) * PER_PAGE)
     .limit(PER_PAGE);
 
   res.status(200).json({
-    message: "Fetched posts successfully.",
+    message: "Fetched posts.",
     posts,
     totalItems
   });
@@ -34,7 +42,7 @@ exports.createPost = async (req, res, next) => {
   await user.save();
 
   const response = {
-    message: "Post created successfully!",
+    message: "Created post.",
     post,
     creator: { _id: user._id, name: user.name }
   };
@@ -49,29 +57,34 @@ exports.createPost = async (req, res, next) => {
 
 exports.getPost = (req, res, next) =>
   Post.findById(req.params.postId)
-    .populate("creator")
-    .populate("comments")
+    .populate([
+      { path: "creator", select: "name country" },
+      {
+        path: "comments",
+        select: "content createdAt",
+        populate: { path: "creator", select: "name country" }
+      }
+    ])
     .then(post => {
       if (!post) {
         const error = new Error("Could not find post.");
         error.statusCode = 404;
         throw error;
       }
-      res.status(200).json({ message: "Post fetched.", post });
+      res.status(200).json({ message: "Fetched post.", post });
     })
     .catch(err => next(err));
 
 exports.updatePost = (req, res, next) => {
   const { title, content } = req.body;
 
-  Post.findById(req.params.postId)
-    .populate("creator")
-    .then(async post => {
-      post.title = title;
-      post.content = content;
-      await post.save();
-
-      const response = { message: "Post updated!", post };
+  Post.findOneAndUpdate(
+    { id_: req.params.postId },
+    { $set: { title, content } },
+    { new: true }
+  )
+    .then(post => {
+      const response = { message: "Updated post.", post };
       io.getIO().emit("posts", { action: "update", ...response });
       return res.status(200).json(response);
     })
@@ -79,14 +92,15 @@ exports.updatePost = (req, res, next) => {
 };
 
 exports.deletePost = async (req, res, next) => {
-  const postId = req.params.postId;
   const user = await User.findById(req.userId);
+  user.posts.pull(req.params.postId);
 
-  await Post.findByIdAndRemove(postId);
-  user.posts.pull(postId);
-  await user.save();
-
-  const response = { message: "Deleted post.", post: postId };
-  io.getIO.emit("posts", { action: "delete", ...response });
-  res.status(200).json(response);
+  Post.findOneAndRemove({ id_: req.params.postId })
+    .then(async post => {
+      await user.save();
+      const response = { message: "Deleted post.", post };
+      io.getIO().emit("posts", { action: "delete", ...response });
+      res.status(200).json(response);
+    })
+    .catch(err => next(err));
 };

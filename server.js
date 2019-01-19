@@ -29,11 +29,11 @@ app.use("/auth", authRoutes);
 app.use("/calendar", eventRoutes);
 app.use("/feed", feedRoutes);
 
-app.use((error, req, res, next) => {
+app.use((error, req, res, next) =>
   res
     .status(error.statusCode || 500)
-    .json({ message: error.message, data: error.data });
-});
+    .json({ message: error.message, data: error.data })
+);
 
 mongoose
   .connect(
@@ -41,7 +41,7 @@ mongoose
     { useNewUrlParser: true }
   )
   .then(() => {
-    const server = app.listen(process.env.PORT || 8080);
+    const server = app.listen(process.env.PORT || 5000);
     socket.init(server);
   })
   .catch(err => console.log(err));

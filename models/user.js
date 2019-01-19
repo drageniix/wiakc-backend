@@ -16,7 +16,7 @@ const userSchema = new Schema({
   },
   country: {
     type: String,
-    required: true
+    default: "US"
   },
   privilege: {
     type: Number,

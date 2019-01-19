@@ -11,6 +11,16 @@ const postSchema = new Schema(
       type: String,
       required: true
     },
+    reactions: [
+      {
+        reaction_type: Number,
+        creator: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+          required: true
+        }
+      }
+    ],
     comments: [
       {
         type: Schema.Types.ObjectId,
