@@ -40,9 +40,10 @@ exports.updateComment = (req, res, next) => {
 
   Comment.findOneAndUpdate(
     { _id: req.params.commentId },
-    { $set: { content } },
-    { returnNewDocument: true }
+    { content },
+    { new: true }
   )
+    .exec()
     .then(comment => {
       const response = {
         message: "Updated comment.",
@@ -67,6 +68,7 @@ exports.deleteComment = async (req, res, next) => {
   post.comments.pull(req.params.commentId);
 
   Comment.findOneAndDelete({ _id: req.params.commentId })
+    .exec()
     .then(async () => {
       await user.save();
       await post.save();

@@ -80,9 +80,10 @@ exports.updatePost = (req, res, next) => {
 
   Post.findOneAndUpdate(
     { id_: req.params.postId },
-    { $set: { title, content } },
-    { returnNewDocument: true }
+    { title, content },
+    { new: true }
   )
+    .exec()
     .then(post => {
       const response = { message: "Updated post.", post };
       io.getIO().emit("posts", { action: "update", ...response });
@@ -96,6 +97,7 @@ exports.deletePost = async (req, res, next) => {
   user.posts.pull(req.params.postId);
 
   Post.findOneAndRemove({ id_: req.params.postId })
+    .exec()
     .then(async () => {
       await user.save();
       const response = { message: "Deleted post.", post: req.params.postId };

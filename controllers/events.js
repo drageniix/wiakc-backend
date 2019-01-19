@@ -59,15 +59,14 @@ exports.updateEvent = (req, res, next) => {
   Event.findOneAndUpdate(
     { id_: req.params.eventId },
     {
-      $set: {
-        date,
-        emphasis,
-        title,
-        details
-      }
+      date,
+      emphasis,
+      title,
+      details
     },
-    { returnNewDocument: true }
+    { new: true }
   )
+    .exec()
     .then(event => {
       const response = {
         message: "Updated event.",
@@ -82,6 +81,7 @@ exports.updateEvent = (req, res, next) => {
 
 exports.deleteEvent = (req, res, next) =>
   Event.findOneAndDelete({ id_: req.params.eventId })
+    .exec()
     .then(() => {
       const response = {
         message: "Deleted event.",
