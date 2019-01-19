@@ -1,6 +1,17 @@
 const Event = require("../models/event");
+const { body } = require("express-validator/check");
+const commonMiddleware = require("./common");
 
-exports.alterEvent = (req, res, next) =>
+exports.validateEvent = [
+  body("title")
+    .trim()
+    .not()
+    .isEmpty()
+    .withMessage("Event must have a title."),
+  commonMiddleware.inputValidation
+];
+
+exports.alterEventPermission = (req, res, next) =>
   Event.findById(req.params.eventId)
     .then(event => {
       if (!event) {

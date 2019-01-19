@@ -1,5 +1,4 @@
 const express = require("express");
-const { body } = require("express-validator/check");
 
 const commentRoutes = require("./comments");
 
@@ -14,15 +13,7 @@ router.get("/posts", feedController.getPosts);
 router.post(
   "/post",
   commonMiddleware.isAuth,
-  [
-    body("title")
-      .trim()
-      .isLength({ min: 5 }),
-    body("content")
-      .trim()
-      .isLength({ min: 5 })
-  ],
-  commonMiddleware.inputValidation,
+  feedMiddleware.validatePost,
   feedController.createPost
 );
 
@@ -31,23 +22,15 @@ router.get("/post/:postId", feedController.getPost);
 router.put(
   "/post/:postId",
   commonMiddleware.isAuth,
-  [
-    body("title")
-      .trim()
-      .isLength({ min: 5 }),
-    body("content")
-      .trim()
-      .isLength({ min: 5 })
-  ],
-  commonMiddleware.inputValidation,
-  feedMiddleware.alterPost,
+  feedMiddleware.validatePost,
+  feedMiddleware.alterPostPermission,
   feedController.updatePost
 );
 
 router.delete(
   "/post/:postId",
   commonMiddleware.isAuth,
-  feedMiddleware.alterPost,
+  feedMiddleware.alterPostPermission,
   feedController.deletePost
 );
 

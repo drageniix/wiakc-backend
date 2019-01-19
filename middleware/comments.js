@@ -1,6 +1,15 @@
 const Comment = require("../models/comment");
+const { body } = require("express-validator/check");
+const commonMiddleware = require("./common");
 
-exports.alterComment = (req, res, next) =>
+exports.validateComment = [
+  body("content")
+    .trim()
+    .isLength({ min: 2 }),
+  commonMiddleware.inputValidation
+];
+
+exports.alterCommentPermission = (req, res, next) =>
   Comment.findById(req.params.commentId)
     .then(comment => {
       if (!comment) {

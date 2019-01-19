@@ -1,5 +1,4 @@
 const express = require("express");
-const { body } = require("express-validator/check");
 
 const eventController = require("../controllers/events");
 const eventMiddleware = require("../middleware/events");
@@ -12,32 +11,22 @@ router.get("/", eventController.getEvents);
 router.post(
   "/",
   commonMiddleware.isAuth,
-  [
-    body("title")
-      .trim()
-      .isLength({ min: 3 })
-  ],
-  commonMiddleware.inputValidation,
+  eventMiddleware.validateEvent,
   eventController.createEvent
 );
 
 router.put(
   "/:eventId",
   commonMiddleware.isAuth,
-  [
-    body("title")
-      .trim()
-      .isLength({ min: 3 })
-  ],
-  commonMiddleware.inputValidation,
-  eventMiddleware.alterEvent,
+  eventMiddleware.validateEvent,
+  eventMiddleware.alterEventPermission,
   eventController.updateEvent
 );
 
 router.delete(
   "/:eventId",
   commonMiddleware.isAuth,
-  eventMiddleware.alterEvent,
+  eventMiddleware.alterEventPermission,
   eventController.deleteEvent
 );
 

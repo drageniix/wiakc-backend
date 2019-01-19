@@ -1,6 +1,18 @@
 const Post = require("../models/post");
+const { body } = require("express-validator/check");
+const commonMiddleware = require("./common");
 
-exports.alterPost = (req, res, next) =>
+exports.validatePost = [
+  body("title")
+    .trim()
+    .isLength({ min: 5 }),
+  body("content")
+    .trim()
+    .isLength({ min: 5 }),
+  commonMiddleware.inputValidation
+];
+
+exports.alterPostPermission = (req, res, next) =>
   Post.findById(req.params.postId)
     .then(post => {
       if (!post) {
