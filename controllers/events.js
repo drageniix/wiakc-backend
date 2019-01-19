@@ -66,7 +66,7 @@ exports.updateEvent = (req, res, next) => {
         details
       }
     },
-    { new: true }
+    { returnNewDocument: true }
   )
     .then(event => {
       const response = {

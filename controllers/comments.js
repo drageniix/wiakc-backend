@@ -38,7 +38,11 @@ exports.postComment = (req, res, next) => {
 exports.updateComment = (req, res, next) => {
   const { content } = req.body;
 
-  Comment.findOneAndUpdate({ _id: req.params.commentId }, { $set: { content } })
+  Comment.findOneAndUpdate(
+    { _id: req.params.commentId },
+    { $set: { content } },
+    { returnNewDocument: true }
+  )
     .then(comment => {
       const response = {
         message: "Updated comment.",

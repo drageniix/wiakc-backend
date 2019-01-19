@@ -81,7 +81,7 @@ exports.updatePost = (req, res, next) => {
   Post.findOneAndUpdate(
     { id_: req.params.postId },
     { $set: { title, content } },
-    { new: true }
+    { returnNewDocument: true }
   )
     .then(post => {
       const response = { message: "Updated post.", post };
