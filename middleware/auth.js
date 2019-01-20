@@ -40,7 +40,7 @@ exports.validatePrivilege = [
       }
     })
   ),
-  body("privilige")
+  body("privilege")
     .isNumeric()
     .withMessage("Invalid privilege value."),
   commonMiddleware.inputValidation
