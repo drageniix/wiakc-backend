@@ -88,8 +88,9 @@ exports.validateUpdate = [
     .isLength({ min: 5 })
     .withMessage("Password must be at least 5 characters")
     .custom((password, { req: { userId } }) =>
-      User.findById(userId).then(user => {
-        if (!(await bcrypt.compare(password, user.password))) {
+      User.findById(userId).then(async user => {
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
           throw new Error("Incorrect password.");
         }
       })

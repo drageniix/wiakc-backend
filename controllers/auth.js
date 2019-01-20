@@ -92,6 +92,8 @@ exports.initiateResetPassword = (req, res, next) =>
     .catch(err => next(err));
 
 exports.resetPassword = async (req, res, next) => {
+  const password = await bcrypt.hash(req.body.password, 12);
+
   User.findOneAndUpdate(
     {
       _id: req.body.userId,
@@ -100,7 +102,7 @@ exports.resetPassword = async (req, res, next) => {
     },
     {
       $set: {
-        password: await bcrypt.hash(req.body.password, 12),
+        password,
         tempToken: undefined,
         tempTokenExpiration: undefined
       }
