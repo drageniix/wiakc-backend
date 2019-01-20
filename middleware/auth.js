@@ -33,10 +33,10 @@ exports.validateSignup = [
 
 exports.validatePrivilege = [
   body("userId").isAlphanumeric(),
-  body("token").custom((token, { req: { body: { userId } } }) =>
-    User.findById(userId).then(user => {
+  body("token").custom((token, { req }) =>
+    User.findById(req.body.userId).then(user => {
       if (user.tempToken !== token) {
-        Promise.reject("Token does not match,");
+        Promise.reject("Token does not match.");
       }
     })
   ),

@@ -18,7 +18,6 @@ router.post("/login", authMiddleware.validateLogin, authController.login);
 
 router.post(
   "/update",
-  commonMiddleware.isAuth,
   authMiddleware.validateUpdate,
   authController.updateUserDetails
 );
