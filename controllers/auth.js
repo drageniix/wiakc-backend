@@ -24,7 +24,6 @@ exports.signup = async (req, res, next) => {
 exports.updateUserPrivilege = (req, res, next) =>
   User.findOneAndUpdate(
     {
-      _id: req.body.userId,
       tempToken: req.body.token
     },
     {
@@ -37,19 +36,16 @@ exports.updateUserPrivilege = (req, res, next) =>
     { new: true }
   )
     .exec()
-    .then(
-      user =>
-        (user &&
-          res.status(201).json({
-            user: {
-              name: user.name,
-              country: user.country,
-              email: user.email,
-              privilege: user.privilege
-            },
-            message: "User updated."
-          })) ||
-        res.send(401).json({ message: "Could not verify token." })
+    .then(user =>
+      res.status(201).json({
+        user: {
+          name: user.name,
+          country: user.country,
+          email: user.email,
+          privilege: user.privilege
+        },
+        message: "User updated."
+      })
     )
     .catch(err => next(err));
 

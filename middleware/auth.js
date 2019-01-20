@@ -32,13 +32,12 @@ exports.validateSignup = [
 ];
 
 exports.validatePrivilege = [
-  body("userId").isAlphanumeric(),
   body("token")
     .isAlphanumeric()
-    .custom((token, { req }) => {
-      return User.findById(req.body.userId).then(user => {
-        if (!user || user.tempToken !== token) {
-          Promise.reject("Token does not match.");
+    .custom(token => {
+      return User.find({ token: token }).then(user => {
+        if (!user) {
+          Promise.reject("No user for this token.");
         }
       });
     }),
