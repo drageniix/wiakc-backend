@@ -53,7 +53,6 @@ userSchema.methods.sendConfirmEmail = function() {
     } else {
       const token = bufferResult.toString("hex");
       this.tempToken = token;
-      this.tempTokenExpiration = Date.now() + 3600000;
       await this.save();
       mailer.send({
         to: this.email,

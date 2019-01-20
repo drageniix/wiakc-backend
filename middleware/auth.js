@@ -33,13 +33,15 @@ exports.validateSignup = [
 
 exports.validatePrivilege = [
   body("userId").isAlphanumeric(),
-  body("token").custom((token, { req }) =>
-    User.findById(req.body.userId).then(user => {
-      if (user.tempToken !== token) {
-        Promise.reject("Token does not match.");
-      }
-    })
-  ),
+  body("token")
+    .isAlphanumeric()
+    .custom((token, { req }) => {
+      return User.findById(req.body.userId).then(user => {
+        if (!user || user.tempToken !== token) {
+          Promise.reject("Token does not match.");
+        }
+      });
+    }),
   body("privilege")
     .isNumeric()
     .withMessage("Invalid privilege value."),

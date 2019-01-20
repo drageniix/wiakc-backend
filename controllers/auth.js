@@ -21,25 +21,35 @@ exports.signup = async (req, res, next) => {
     .catch(err => next(err));
 };
 
-exports.updateUserPrivilege = (res, req, next) =>
+exports.updateUserPrivilege = (req, res, next) =>
   User.findOneAndUpdate(
-    { _id: req.body.userId },
-    { $set: { privilege: req.body.privilege } },
+    {
+      _id: req.body.userId,
+      tempToken: req.body.token
+    },
+    {
+      $set: {
+        privilege: req.body.privilege,
+        tempToken: undefined,
+        tempTokenExpiration: undefined
+      }
+    },
     { new: true }
   )
     .exec()
     .then(
       user =>
-        user &&
-        res.status(201).json({
-          user: {
-            name: user.name,
-            country: user.country,
-            email: user.email,
-            privilege: user.privilege
-          },
-          message: "User updated."
-        })
+        (user &&
+          res.status(201).json({
+            user: {
+              name: user.name,
+              country: user.country,
+              email: user.email,
+              privilege: user.privilege
+            },
+            message: "User updated."
+          })) ||
+        res.send(401).json({ message: "Could not verify token." })
     )
     .catch(err => next(err));
 
@@ -97,8 +107,8 @@ exports.resetPassword = async (req, res, next) => {
   User.findOneAndUpdate(
     {
       _id: req.body.userId,
-      resetToken: req.body.token,
-      resetTokenExpiration: { $gt: Date.now() }
+      tempToken: req.body.token,
+      tempTokenExpiration: { $gt: Date.now() }
     },
     {
       $set: {
