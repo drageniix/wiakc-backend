@@ -18,7 +18,8 @@ exports.getPosts = async (req, res, next) => {
   res.status(200).json({
     message: "Fetched posts.",
     posts,
-    totalItems
+    totalItems,
+    itemsPerPage: PER_PAGE
   });
 };
 
@@ -34,14 +35,13 @@ exports.createPost = (req, res, next) =>
       user.posts.push(post._id);
       await user.save();
 
-      return await post
+      const post = await post
         .populate({
           path: "creator",
           select: "name country"
         })
         .execPopulate();
-    })
-    .then(post => {
+
       const response = {
         message: "Created post.",
         post,
