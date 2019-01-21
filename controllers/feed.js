@@ -7,9 +7,11 @@ const PER_PAGE = 8;
 
 exports.getPosts = async (req, res, next) => {
   const currentPage = req.query.page || 1;
-  const totalItems = await Post.find().countDocuments();
+  const query =
+    (req.query.userId && { creator: req.query.userId }) || undefined;
+  const totalItems = await Post.find(query).countDocuments();
 
-  const posts = await Post.find()
+  const posts = await Post.find(query)
     .populate("creator", "name country")
     .sort({ createdAt: -1 })
     .skip((currentPage - 1) * PER_PAGE)
