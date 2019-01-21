@@ -6,11 +6,13 @@ exports.validatePost = [
   body("title")
     .trim()
     .not()
-    .isEmpty(),
+    .isEmpty()
+    .withMessage("Please enter a title."),
   body("content")
     .trim()
     .not()
-    .isEmpty(),
+    .isEmpty()
+    .withMessage("Please enter some text."),
   commonMiddleware.inputValidation
 ];
 
