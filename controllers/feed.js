@@ -35,7 +35,7 @@ exports.createPost = (req, res, next) =>
       user.posts.push(post._id);
       await user.save();
 
-      const post = await post
+      post = await post
         .populate({
           path: "creator",
           select: "name country"
