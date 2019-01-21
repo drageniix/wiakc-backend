@@ -3,7 +3,7 @@ const io = require("../middleware/socket");
 const Post = require("../models/post");
 const User = require("../models/user");
 
-const PER_PAGE = 10;
+const PER_PAGE = 8;
 
 exports.getPosts = async (req, res, next) => {
   const currentPage = req.query.page || 1;
@@ -29,31 +29,38 @@ exports.getPosts = async (req, res, next) => {
   });
 };
 
-exports.createPost = async (req, res, next) => {
-  const { title, content } = req.body;
-  const post = await new Post({
-    title,
-    content,
+exports.createPost = (req, res, next) =>
+  new Post({
+    title: req.body.title,
+    content: req.body.content,
     creator: req.userId
-  }).save();
+  })
+    .save()
+    .then(async post => {
+      const user = await User.findById(req.userId);
+      user.posts.push(post._id);
+      await user.save();
 
-  const user = await User.findById(req.userId);
-  user.posts.push(post._id);
-  await user.save();
+      return await Post.populate(post, {
+        path: "creator",
+        select: "name country"
+      }).exec();
+    })
+    .then(post => {
+      const response = {
+        message: "Created post.",
+        post,
+        creator: { _id: user._id, name: user.name }
+      };
 
-  const response = {
-    message: "Created post.",
-    post,
-    creator: { _id: user._id, name: user.name }
-  };
+      io.getIO().emit("posts", {
+        action: "create",
+        ...response
+      });
 
-  io.getIO().emit("posts", {
-    action: "create",
-    ...response
-  });
-
-  res.status(201).json(response);
-};
+      res.status(201).json(response);
+    })
+    .catch(err => next(err));
 
 exports.getPost = (req, res, next) =>
   Post.findById(req.params.postId)
@@ -83,10 +90,21 @@ exports.updatePost = (req, res, next) => {
     { $set: { title, content } },
     { new: true }
   )
+    .populate([
+      { path: "creator", select: "name country" },
+      {
+        path: "comments",
+        select: "content createdAt",
+        populate: { path: "creator", select: "name country" }
+      }
+    ])
     .exec()
     .then(post => {
       const response = { message: "Updated post.", post };
-      io.getIO().emit("posts", { action: "update", ...response });
+      io.getIO().emit("posts", {
+        action: "update",
+        ...response
+      });
       return res.status(200).json(response);
     })
     .catch(err => next(err));
