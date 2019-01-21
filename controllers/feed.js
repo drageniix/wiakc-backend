@@ -10,14 +10,7 @@ exports.getPosts = async (req, res, next) => {
   const totalItems = await Post.find().countDocuments();
 
   const posts = await Post.find()
-    .populate([
-      { path: "creator", select: "name country" },
-      {
-        path: "comments",
-        select: "content createdAt",
-        populate: { path: "creator", select: "name country" }
-      }
-    ])
+    .populate("creator", "name country")
     .sort({ createdAt: -1 })
     .skip((currentPage - 1) * PER_PAGE)
     .limit(PER_PAGE);
@@ -41,10 +34,12 @@ exports.createPost = (req, res, next) =>
       user.posts.push(post._id);
       await user.save();
 
-      return await Post.populate(post, {
-        path: "creator",
-        select: "name country"
-      }).exec();
+      return await post
+        .populate({
+          path: "creator",
+          select: "name country"
+        })
+        .execPopulate();
     })
     .then(post => {
       const response = {
