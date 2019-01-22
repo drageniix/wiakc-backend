@@ -7,7 +7,7 @@ const User = require("../models/user");
 exports.postComment = (req, res, next) => {
   const { content } = req.body;
 
-  new Comment({ content, creator: req.userId })
+  new Comment({ content, creator: req.userId, postId: req.params.postId })
     .save()
     .then(async comment => {
       await Post.findById(req.params.postId).then(post => {
