@@ -20,6 +20,10 @@ exports.postComment = (req, res, next) => {
         return user.save();
       });
 
+      comment = await comment
+        .populate("creator", "name country")
+        .execPopulate();
+
       const response = {
         message: "Created comment.",
         comment
@@ -43,6 +47,7 @@ exports.updateComment = (req, res, next) => {
     { $set: { content } },
     { new: true }
   )
+    .populate("creator", "name country")
     .exec()
     .then(comment => {
       const response = {
@@ -75,7 +80,7 @@ exports.deleteComment = async (req, res, next) => {
 
       const response = {
         message: "Deleted comment.",
-        comment: req.params.commentId,
+        commentId: req.params.commentId,
         postId: req.params.postId
       };
 

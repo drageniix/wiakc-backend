@@ -6,7 +6,8 @@ exports.validateComment = [
   body("content")
     .trim()
     .not()
-    .isEmpty(),
+    .isEmpty()
+    .withMessage("Comment must not be empty."),
   commonMiddleware.inputValidation
 ];
 
