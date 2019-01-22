@@ -12,7 +12,7 @@ exports.getPosts = async (req, res, next) => {
   const totalItems = await Post.find(query).countDocuments();
 
   const posts = await Post.find(query)
-    .populate("creator", "name country imageUrl")
+    .populate("creator", "name country flag")
     .sort({ createdAt: -1 })
     .skip((currentPage - 1) * PER_PAGE)
     .limit(PER_PAGE);
@@ -40,7 +40,7 @@ exports.createPost = (req, res, next) =>
       post = await post
         .populate({
           path: "creator",
-          select: "name country imageUrl"
+          select: "name country flag"
         })
         .execPopulate();
 
@@ -62,11 +62,11 @@ exports.createPost = (req, res, next) =>
 exports.getPost = (req, res, next) =>
   Post.findById(req.params.postId)
     .populate([
-      { path: "creator", select: "name country imageUrl" },
+      { path: "creator", select: "name country flag" },
       {
         path: "comments",
         select: "content createdAt",
-        populate: { path: "creator", select: "name country imageUrl" }
+        populate: { path: "creator", select: "name country flag" }
       }
     ])
     .then(post => {
@@ -88,11 +88,11 @@ exports.updatePost = (req, res, next) => {
     { new: true }
   )
     .populate([
-      { path: "creator", select: "name country imageUrl" },
+      { path: "creator", select: "name country flag" },
       {
         path: "comments",
         select: "content createdAt",
-        populate: { path: "creator", select: "name country imageUrl" }
+        populate: { path: "creator", select: "name country flag" }
       }
     ])
     .exec()

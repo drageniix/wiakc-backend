@@ -1,16 +1,18 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
+const getFlag = require("../middleware/flag");
 const User = require("../models/user");
 
 exports.signup = async (req, res, next) => {
   const { email, name, password, country } = req.body;
+  const flag = await getFlag(country);
   const hashedPassword = await bcrypt.hash(password, 12);
   new User({
     email,
     password: hashedPassword,
     name,
-    country
+    country,
+    flag
   })
     .save()
     .then(user => {
@@ -43,7 +45,7 @@ exports.updateUserPrivilege = (req, res, next) =>
           country: user.country,
           email: user.email,
           privilege: user.privilege,
-          imageUrl: user.imageUrl
+          flag: user.flag
         },
         message: "User updated."
       })
@@ -65,6 +67,8 @@ exports.updateUserDetails = async (req, res, next) => {
     country: req.body.country
   };
 
+  updateInfo.flag = await getFlag(updateInfo.country);
+
   if (req.body.password) {
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
     updateInfo.password = hashedPassword;
@@ -80,21 +84,18 @@ exports.updateUserDetails = async (req, res, next) => {
     { new: true }
   )
     .exec()
-    .then(user => {
-      if (user.imageUrl && updateInfo.imageUrl !== user.imageUrl) {
-        clearImage(user.imageUrl);
-      }
-
+    .then(user =>
       res.status(201).json({
         user: {
           name: user.name,
           country: user.country,
           email: user.email,
-          privilege: user.privilege
+          privilege: user.privilege,
+          flag: user.flag
         },
         message: "User updated."
-      });
-    })
+      })
+    )
     .catch(err => next(err));
 };
 
@@ -145,7 +146,7 @@ function login(user) {
       country: user.country,
       email: user.email,
       privilege: user.privilege,
-      imageUrl: user.imageUrl
+      flag: user.flag
     },
     userId: user._id.toString(),
     privilege: user.privilege

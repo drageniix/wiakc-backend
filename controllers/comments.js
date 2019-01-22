@@ -21,7 +21,7 @@ exports.postComment = (req, res, next) => {
       });
 
       comment = await comment
-        .populate("creator", "name country imageUrl")
+        .populate("creator", "name country flag")
         .execPopulate();
 
       const response = {
@@ -47,7 +47,7 @@ exports.updateComment = (req, res, next) => {
     { $set: { content } },
     { new: true }
   )
-    .populate("creator", "name country imageUrl")
+    .populate("creator", "name country flag")
     .exec()
     .then(comment => {
       const response = {
