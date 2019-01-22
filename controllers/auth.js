@@ -42,7 +42,8 @@ exports.updateUserPrivilege = (req, res, next) =>
           name: user.name,
           country: user.country,
           email: user.email,
-          privilege: user.privilege
+          privilege: user.privilege,
+          imageUrl: user.imageUrl
         },
         message: "User updated."
       })
@@ -143,7 +144,8 @@ function login(user) {
       name: user.name,
       country: user.country,
       email: user.email,
-      privilege: user.privilege
+      privilege: user.privilege,
+      imageUrl: user.imageUrl
     },
     userId: user._id.toString(),
     privilege: user.privilege

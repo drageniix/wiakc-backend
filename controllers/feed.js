@@ -12,7 +12,7 @@ exports.getPosts = async (req, res, next) => {
   const totalItems = await Post.find(query).countDocuments();
 
   const posts = await Post.find(query)
-    .populate("creator", "name country")
+    .populate("creator", "name country imageUrl")
     .sort({ createdAt: -1 })
     .skip((currentPage - 1) * PER_PAGE)
     .limit(PER_PAGE);
@@ -40,7 +40,7 @@ exports.createPost = (req, res, next) =>
       post = await post
         .populate({
           path: "creator",
-          select: "name country"
+          select: "name country imageUrl"
         })
         .execPopulate();
 
@@ -62,11 +62,11 @@ exports.createPost = (req, res, next) =>
 exports.getPost = (req, res, next) =>
   Post.findById(req.params.postId)
     .populate([
-      { path: "creator", select: "name country" },
+      { path: "creator", select: "name country imageUrl" },
       {
         path: "comments",
         select: "content createdAt",
-        populate: { path: "creator", select: "name country" }
+        populate: { path: "creator", select: "name country imageUrl" }
       }
     ])
     .then(post => {
@@ -88,11 +88,11 @@ exports.updatePost = (req, res, next) => {
     { new: true }
   )
     .populate([
-      { path: "creator", select: "name country" },
+      { path: "creator", select: "name country imageUrl" },
       {
         path: "comments",
         select: "content createdAt",
-        populate: { path: "creator", select: "name country" }
+        populate: { path: "creator", select: "name country imageUrl" }
       }
     ])
     .exec()
