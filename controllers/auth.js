@@ -1,6 +1,5 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const sharp = require("sharp");
 
 const User = require("../models/user");
 
@@ -62,7 +61,7 @@ exports.updateUserDetails = async (req, res, next) => {
   let updateInfo = {
     email: req.body.email,
     name: req.body.name,
-    country: req.body.country
+    country: req.body
   };
 
   if (req.body.password) {
@@ -71,9 +70,6 @@ exports.updateUserDetails = async (req, res, next) => {
   }
 
   if (req.file) {
-    const image = await sharp(req.file.buffer)
-      .resize(200, 200)
-      .toBuffer();
     updateInfo.imageUrl = `data:image/png;base64,${image.toString("base64")}`;
   }
 

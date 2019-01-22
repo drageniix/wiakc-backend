@@ -1,6 +1,5 @@
 const express = require("express");
 
-const multer = require("../middleware/files");
 const commonMiddleware = require("../middleware/common");
 const authMiddleware = require("../middleware/auth");
 const authController = require("../controllers/auth");
@@ -20,7 +19,6 @@ router.post("/login", authMiddleware.validateLogin, authController.login);
 router.put(
   "/update",
   commonMiddleware.isAuth,
-  multer,
   authMiddleware.validateUpdate,
   authController.updateUserDetails
 );
