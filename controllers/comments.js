@@ -75,7 +75,8 @@ exports.deleteComment = async (req, res, next) => {
 
       const response = {
         message: "Deleted comment.",
-        comment: req.params.commentId
+        comment: req.params.commentId,
+        postId: req.params.postId
       };
 
       io.getIO().emit("comments", {
