@@ -61,7 +61,7 @@ exports.updateUserDetails = async (req, res, next) => {
   let updateInfo = {
     email: req.body.email,
     name: req.body.name,
-    country: req.body
+    country: req.body.country
   };
 
   if (req.body.password) {
