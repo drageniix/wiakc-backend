@@ -69,8 +69,8 @@ exports.updateUserDetails = async (req, res, next) => {
     updateInfo.password = hashedPassword;
   }
 
-  if (req.file) {
-    updateInfo.imageUrl = `data:image/png;base64,${image.toString("base64")}`;
+  if (req.body.image) {
+    updateInfo.imageUrl = req.body.image;
   }
 
   User.findOneAndUpdate(
