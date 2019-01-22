@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const path = require("path");
+
 const authRoutes = require("./routes/auth");
 const feedRoutes = require("./routes/feed");
 const eventRoutes = require("./routes/events");

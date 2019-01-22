@@ -26,6 +26,9 @@ const userSchema = new Schema({
     type: Number,
     default: 0
   },
+  imageUrl: {
+    type: String
+  },
   tempToken: {
     type: String
   },

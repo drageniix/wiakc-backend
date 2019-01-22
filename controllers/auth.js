@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const sharp = require("sharp");
 
 const User = require("../models/user");
 
@@ -69,13 +70,24 @@ exports.updateUserDetails = async (req, res, next) => {
     updateInfo.password = hashedPassword;
   }
 
+  if (req.file) {
+    updateInfo.imageUrl = req.userId + ".png";
+    await sharp(req.file.buffer)
+      .resize(200, 200)
+      .toFile(updateInfo.imageUrl);
+  }
+
   User.findOneAndUpdate(
     { _id: req.userId },
     { $set: updateInfo },
     { new: true }
   )
     .exec()
-    .then(user =>
+    .then(user => {
+      if (user.imageUrl && updateInfo.imageUrl !== user.imageUrl) {
+        clearImage(user.imageUrl);
+      }
+
       res.status(201).json({
         user: {
           name: user.name,
@@ -84,8 +96,8 @@ exports.updateUserDetails = async (req, res, next) => {
           privilege: user.privilege
         },
         message: "User updated."
-      })
-    )
+      });
+    })
     .catch(err => next(err));
 };
 

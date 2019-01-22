@@ -87,7 +87,7 @@ exports.deleteEvent = (req, res, next) =>
     .then(() => {
       const response = {
         message: "Deleted event.",
-        event: req.params.eventId
+        eventId: req.params.eventId
       };
 
       io.getIO().emit("events", { action: "delete", ...response });
