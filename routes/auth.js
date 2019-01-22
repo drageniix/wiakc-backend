@@ -17,7 +17,7 @@ router.post(
 
 router.post("/login", authMiddleware.validateLogin, authController.login);
 
-router.post(
+router.put(
   "/update",
   commonMiddleware.isAuth,
   multer,

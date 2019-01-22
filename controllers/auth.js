@@ -71,10 +71,10 @@ exports.updateUserDetails = async (req, res, next) => {
   }
 
   if (req.file) {
-    updateInfo.imageUrl = req.userId + ".png";
-    await sharp(req.file.buffer)
+    const image = await sharp(req.file.buffer)
       .resize(200, 200)
-      .toFile(updateInfo.imageUrl);
+      .toBuffer();
+    updateInfo.imageUrl = `data:image/png;base64,${image.toString("base64")}`;
   }
 
   User.findOneAndUpdate(
