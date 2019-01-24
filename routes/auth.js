@@ -6,6 +6,13 @@ const authController = require("../controllers/auth");
 
 const router = express.Router();
 
+router.get(
+  "/users",
+  commonMiddleware.isAuth,
+  authMiddleware.validateAdmin,
+  authController.getAllUsers
+);
+
 router.post("/signup", authMiddleware.validateSignup, authController.signup);
 
 router.post(

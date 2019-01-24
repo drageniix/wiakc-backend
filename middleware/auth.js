@@ -3,6 +3,17 @@ const bcrypt = require("bcryptjs");
 const { body } = require("express-validator/check");
 const commonMiddleware = require("./common");
 
+exports.validateAdmin = (req, res, next) =>
+  User.findById(req.userId)
+    .then(user => {
+      if (!user || !(user.privilege >= 3)) {
+        const error = new Error("Not authenticated.");
+        error.statusCode = 401;
+        next(error);
+      } else next();
+    })
+    .catch(err => next(err));
+
 exports.validateSignup = [
   body("email")
     .isEmail()

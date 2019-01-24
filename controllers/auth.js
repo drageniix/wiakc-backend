@@ -3,6 +3,13 @@ const jwt = require("jsonwebtoken");
 const getFlag = require("../middleware/flag");
 const User = require("../models/user");
 
+exports.getAllUsers = async (req, res, next) =>
+  User.find()
+    .select("name email country privilege")
+    .exec()
+    .then(users => res.status(200).json({ message: "Users fetched.", users }))
+    .catch(err => next(err));
+
 exports.signup = async (req, res, next) => {
   const { email, name, password, country } = req.body;
   const flag = await getFlag(country);
