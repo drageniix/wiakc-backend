@@ -24,10 +24,11 @@ const assembleQuery = req => {
 
 exports.getPosts = async (req, res, next) => {
   const currentPage = req.query.page || 1;
+  const query = assembleQuery(req);
 
   const totalItems = await Post.find(query).countDocuments();
 
-  const posts = await Post.find(assembleQuery(req))
+  const posts = await Post.find(query)
     .populate("creator", "name flag")
     .sort({ createdAt: -1 })
     .skip((currentPage - 1) * PER_PAGE)
