@@ -27,13 +27,12 @@ exports.getEvents = async (req, res, next) => {
 };
 
 exports.createEvent = (req, res, next) => {
-  const { date, title, details, emphasis } = req.body;
+  const { date, title, details } = req.body;
 
   new Event({
     date,
     title,
     details,
-    emphasis,
     creator: req.userId
   })
     .save()
@@ -54,14 +53,13 @@ exports.createEvent = (req, res, next) => {
 };
 
 exports.updateEvent = (req, res, next) => {
-  const { date, title, details, emphasis } = req.body;
+  const { date, title, details } = req.body;
 
   Event.findOneAndUpdate(
     { _id: req.params.eventId },
     {
       $set: {
         date,
-        emphasis,
         title,
         details
       }

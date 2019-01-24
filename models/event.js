@@ -14,10 +14,6 @@ const commentSchema = new Schema(
     details: {
       type: String
     },
-    emphasis: {
-      type: Boolean,
-      default: false
-    },
     creator: {
       type: Schema.Types.ObjectId,
       ref: "User",

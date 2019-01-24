@@ -20,9 +20,7 @@ exports.postComment = (req, res, next) => {
         return user.save();
       });
 
-      comment = await comment
-        .populate("creator", "name country flag")
-        .execPopulate();
+      comment = await comment.populate("creator", "name flag").execPopulate();
 
       const response = {
         message: "Created comment.",
@@ -47,7 +45,7 @@ exports.updateComment = (req, res, next) => {
     { $set: { content } },
     { new: true }
   )
-    .populate("creator", "name country flag")
+    .populate("creator", "name flag")
     .exec()
     .then(comment => {
       const response = {

@@ -1,6 +1,7 @@
 const io = require("../middleware/socket");
 
 const Post = require("../models/post");
+const Comment = require("../models/comment");
 const User = require("../models/user");
 
 const PER_PAGE = 8;
@@ -12,7 +13,7 @@ exports.getPosts = async (req, res, next) => {
   const totalItems = await Post.find(query).countDocuments();
 
   const posts = await Post.find(query)
-    .populate("creator", "name country flag")
+    .populate("creator", "name flag")
     .sort({ createdAt: -1 })
     .skip((currentPage - 1) * PER_PAGE)
     .limit(PER_PAGE);
@@ -40,7 +41,7 @@ exports.createPost = (req, res, next) =>
       post = await post
         .populate({
           path: "creator",
-          select: "name country flag"
+          select: "name flag"
         })
         .execPopulate();
 
@@ -62,11 +63,11 @@ exports.createPost = (req, res, next) =>
 exports.getPost = (req, res, next) =>
   Post.findById(req.params.postId)
     .populate([
-      { path: "creator", select: "name country flag" },
+      { path: "creator", select: "name flag" },
       {
         path: "comments",
         select: "content createdAt",
-        populate: { path: "creator", select: "name country flag" }
+        populate: { path: "creator", select: "name flag" }
       }
     ])
     .then(post => {
@@ -88,11 +89,11 @@ exports.updatePost = (req, res, next) => {
     { new: true }
   )
     .populate([
-      { path: "creator", select: "name country flag" },
+      { path: "creator", select: "name flag" },
       {
         path: "comments",
         select: "content createdAt",
-        populate: { path: "creator", select: "name country flag" }
+        populate: { path: "creator", select: "name flag" }
       }
     ])
     .exec()
@@ -108,16 +109,30 @@ exports.updatePost = (req, res, next) => {
 };
 
 exports.deletePost = async (req, res, next) => {
-  const user = await User.findById(req.userId);
-  user.posts.pull(req.params.postId);
+  try {
+    const user = await User.findById(req.userId)
+      .populate("comments", "creator")
+      .exec();
 
-  Post.findOneAndDelete({ _id: req.params.postId })
-    .exec()
-    .then(async () => {
-      await user.save();
-      const response = { message: "Deleted post.", postId: req.params.postId };
-      io.getIO().emit("posts", { action: "delete", ...response });
-      res.status(200).json(response);
-    })
-    .catch(err => next(err));
+    user.posts.pull(req.params.postId);
+    user.comments = user.comments.filter(
+      comment => comment.creator._id.toString() !== user._id.toString()
+    );
+
+    await Comment.deleteMany({ postId: req.params.postId }).exec();
+
+    await Post.findOneAndDelete({ _id: req.params.postId })
+      .exec()
+      .then(async () => {
+        await user.save();
+        const response = {
+          message: "Deleted post.",
+          postId: req.params.postId
+        };
+        io.getIO().emit("posts", { action: "delete", ...response });
+        res.status(200).json(response);
+      });
+  } catch (err) {
+    console.log(err);
+  }
 };
