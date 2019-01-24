@@ -4,15 +4,30 @@ const Post = require("../models/post");
 const Comment = require("../models/comment");
 const User = require("../models/user");
 
-const PER_PAGE = 8;
+const PER_PAGE = 4;
+
+const assembleQuery = req => {
+  let query;
+  if (req.query.userId) {
+    query = { creator: req.query.userId };
+  } else if (req.query.q) {
+    query = {
+      $or: [
+        { title: { $regex: req.query.q, $options: "i" } },
+        { content: { $regex: req.query.q, $options: "i" } }
+      ]
+    };
+  }
+
+  return query;
+};
 
 exports.getPosts = async (req, res, next) => {
   const currentPage = req.query.page || 1;
-  const query =
-    (req.query.userId && { creator: req.query.userId }) || undefined;
+
   const totalItems = await Post.find(query).countDocuments();
 
-  const posts = await Post.find(query)
+  const posts = await Post.find(assembleQuery(req))
     .populate("creator", "name flag")
     .sort({ createdAt: -1 })
     .skip((currentPage - 1) * PER_PAGE)
@@ -119,20 +134,18 @@ exports.deletePost = async (req, res, next) => {
       comment => comment.creator._id.toString() !== user._id.toString()
     );
 
+    await Post.findOneAndDelete({ _id: req.params.postId }).exec();
     await Comment.deleteMany({ postId: req.params.postId }).exec();
+    await user.save();
 
-    await Post.findOneAndDelete({ _id: req.params.postId })
-      .exec()
-      .then(async () => {
-        await user.save();
-        const response = {
-          message: "Deleted post.",
-          postId: req.params.postId
-        };
-        io.getIO().emit("posts", { action: "delete", ...response });
-        res.status(200).json(response);
-      });
+    const response = {
+      message: "Deleted post.",
+      postId: req.params.postId
+    };
+
+    io.getIO().emit("posts", { action: "delete", ...response });
+    res.status(200).json(response);
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
